@@ -2,26 +2,35 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import ScannerLine from './ScannerLine';
+import { supabase } from '@/utils/supabase/client';
 
-export default function DropsHeaderClient({ user }: { user: any }) {
+export default function DropsHeaderClient() {
   const router = useRouter();
-  const inactivityTimeout = 4 * 60 * 1000; // 4 minutes in ms
+  const inactivityTimeout = 30 * 60 * 1000; // 30 minutes
+  const [mounted, setMounted] = useState(false);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    console.log('DropsHeaderClient mounted - client effects active'); // Debug: Confirm hydration
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      setMounted(true);
+    };
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
 
     let timer: NodeJS.Timeout = setTimeout(() => {
-      console.log('Inactivity timeout triggered'); // Debug
       router.replace('/login');
     }, inactivityTimeout);
 
     const resetTimer = () => {
-      console.log('Activity detected - resetting timer'); // Debug
       clearTimeout(timer);
       timer = setTimeout(() => {
-        console.log('Inactivity timeout triggered');
         router.replace('/login');
       }, inactivityTimeout);
     };
@@ -29,7 +38,7 @@ export default function DropsHeaderClient({ user }: { user: any }) {
     window.addEventListener('mousemove', resetTimer);
     window.addEventListener('keydown', resetTimer);
     window.addEventListener('click', resetTimer);
-    window.addEventListener('scroll', resetTimer); // Added for scroll activity
+    window.addEventListener('scroll', resetTimer);
 
     return () => {
       clearTimeout(timer);
@@ -38,27 +47,43 @@ export default function DropsHeaderClient({ user }: { user: any }) {
       window.removeEventListener('click', resetTimer);
       window.removeEventListener('scroll', resetTimer);
     };
-  }, [router]);
+  }, [mounted, router]);
 
   const handleExit = () => {
-    console.log('Exit button clicked'); // Debug
-    if (window.opener) {
-      window.close(); // Works only if window was script-opened
-    } else {
-      router.replace('/login'); // Safe fallback to login
-    }
+    router.replace('/login');
   };
 
+  if (!mounted) return null;
+
+  const letters = Array.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+
   return (
-    <div className="relative">
-      <div className="max-w-7xl mx-auto px-6 py-8 flex justify-between items-center">
-        <Link href="/" className="text-white font-black text-4xl">Keep95.art</Link>
+    <div className="relative" suppressHydrationWarning>
+      <div className="max-w-7xl mx-auto px-6 py-8 flex items-center justify-between">
+        <Link href="/" className="text-white font-black text-4xl tracking-tighter">
+          Keep95.art
+        </Link>
+        <nav className="hidden lg:flex items-center gap-3">
+          {letters.map((letter) => (
+            <Link
+              key={letter}
+              href={`/drops?letter=${letter}`}
+              className="text-white/60 hover:text-cyan-400 text-lg font-bold transition"
+            >
+              {letter}
+            </Link>
+          ))}
+        </nav>
         {user ? (
           <form action="/auth/signout" method="post">
-            <button className="bg-white text-black px-8 py-3 rounded-full font-bold">Logout</button>
+            <button className="bg-white text-black px-10 py-4 rounded-full text-xl font-black hover:scale-105 transition shadow-xl">
+              Logout
+            </button>
           </form>
         ) : (
-          <button onClick={handleExit} className="bg-white text-black px-8 py-3 rounded-full font-bold">Exit</button>
+          <button onClick={handleExit} className="bg-white text-black px-10 py-4 rounded-full text-xl font-black hover:scale-105 transition shadow-xl">
+            Exit
+          </button>
         )}
       </div>
       <ScannerLine />

@@ -7,8 +7,6 @@ export const revalidate = 60;
 
 export default async function DropsGallery() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
   const { data: drops } = await supabase
     .from('drops')
     .select(`
@@ -23,14 +21,12 @@ export default async function DropsGallery() {
 
   return (
     <main className="fixed inset-0 bg-black flex flex-col text-white">
-      <DropsHeaderClient user={user} />
-
+      <DropsHeaderClient />
       <div className="flex-1 overflow-y-auto px-6 py-12">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-5xl md:text-7xl font-black text-center mb-16">
             Current Drops
           </h1>
-
           {drops && drops.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
               {drops.map((drop) => (
@@ -50,7 +46,6 @@ export default async function DropsGallery() {
                       </div>
                     )}
                   </div>
-
                   <div className="mt-6 text-center">
                     <h3 className="text-2xl font-bold group-hover:text-cyan-400 transition">
                       {drop.title}
