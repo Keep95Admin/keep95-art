@@ -1,8 +1,10 @@
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 
-export default async function DownloadPage({ params }: { params: { dropId: string } }) {
-  const supabase = await createClient() // ← await here
+export default async function DownloadPage({ params }: { params: Promise<{ dropId: string }> }) {
+  const resolvedParams = await params;
+  const { dropId } = resolvedParams;
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) redirect('/login');
@@ -10,7 +12,7 @@ export default async function DownloadPage({ params }: { params: { dropId: strin
   const { data: drop, error } = await supabase
     .from('drops')
     .select('title, file_url, buyer_id')
-    .eq('id', params.dropId)
+    .eq('id', dropId)
     .single();
 
   if (error || !drop || drop.buyer_id !== user.id) {
