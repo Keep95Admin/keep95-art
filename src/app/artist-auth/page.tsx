@@ -28,7 +28,7 @@ export default function ArtistAuth() {
         setLoading(false);
         return;
       }
-      const { error: signupError } = await supabase.auth.signUp({
+      const { data, error: signupError } = await supabase.auth.signUp({
         email,
         password,
         options: { data: { role: 'artist', username } },
@@ -37,6 +37,19 @@ export default function ArtistAuth() {
         setError(signupError.message);
         setLoading(false);
         return;
+      }
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert([
+            { id: data.user.id, email, username, role: 'artist', wallet_address: '' }
+          ], { onConflict: 'id' });
+
+        if (profileError) {
+          setError(profileError.message);
+          setLoading(false);
+          return;
+        }
       }
       setMessage('Magic link sent—check your email to confirm.');
     } else {
