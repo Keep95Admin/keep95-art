@@ -1,11 +1,12 @@
-﻿'use client';
+'use client';
 
 import { supabase } from '@/utils/supabase/client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { User } from '@supabase/supabase-js';
 
 export default function Nav() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setUser(data.session?.user ?? null));
