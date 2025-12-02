@@ -5,8 +5,8 @@ export async function POST(request: Request) {
   const { user_id, email, username } = await request.json();
   const supabase = await createAdminClient();
   const { error } = await supabase
-    .from('profiles')  // Change to 'profiles' to match other code
-    .insert([{ user_id, email, username, role: 'artist', wallet_address: '' }]); // Add role
+    .from('profiles')
+    .insert([{ id: user_id, email, username, role: 'artist', wallet_address: '' }]);
 
   if (error) {
     console.error('Insert error:', error.message);
