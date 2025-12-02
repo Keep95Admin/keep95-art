@@ -3,14 +3,11 @@ import ScannerLine from '@/components/ScannerLine';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';  // Force dynamic, skip prerender
+export const dynamic = 'force-dynamic'; // Force dynamic, skip prerender
 
 export default async function Home() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-
-console.log('Server URL:', process.env.SUPABASE_URL);
-console.log('Server Key:', process.env.SUPABASE_ANON_KEY);
 
   if (user) {
     const { data: profile } = await supabase
@@ -23,9 +20,8 @@ console.log('Server Key:', process.env.SUPABASE_ANON_KEY);
       redirect(`/artist/${user.id}`);
     } else if (profile?.role === 'consumer') {
       redirect('/drops');
-    } else {
-      redirect('/setup'); // If no role, to setup
     }
+    // No redirect for no role—stays on landing
   }
 
   return (
