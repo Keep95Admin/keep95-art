@@ -1,4 +1,7 @@
 'use client';
+
+export const dynamic = 'force-dynamic';  // Force dynamic, skip prerender
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
@@ -13,12 +16,6 @@ export default function ArtistAuth() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-
-  const { data, error: signupError } = await supabase.auth.signUp(...);
-    if (signupError) {
-  console.log(signupError.message); // Log for debug
-  setError(signupError.message);
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
