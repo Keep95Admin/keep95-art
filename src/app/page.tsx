@@ -1,10 +1,10 @@
-﻿import Link from 'next/link';
+import Link from 'next/link';
 import ScannerLine from '@/components/ScannerLine';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 
-console.log('URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-console.log('Key:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+export const dynamic = 'force-dynamic';  // Force dynamic rendering for root
+
 export default async function Home() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -47,7 +47,6 @@ export default async function Home() {
         </div>
         <ScannerLine />
       </div>
-
       {/* Body */}
       <div className="flex-1 flex flex-col items-center justify-center p-8 space-y-8">
         <h1 className="text-8xl font-black tracking-tighter">Keep95.art</h1>
