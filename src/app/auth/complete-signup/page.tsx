@@ -29,13 +29,17 @@ function CompleteSignupContent() {
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
             const { data: profile } = await supabase
-              .from('profiles') // Assume 'profiles' table with 'user_id' and 'role'
-              .select('role')
+              .from('profiles') 
+              .select('role, current_mode')
               .eq('user_id', user.id)
               .single();
 
             if (profile?.role === 'artist') {
-              router.replace(`/artist/${user.id}`);
+              if (profile.current_mode === 'consumer') {
+                router.replace('/drops');
+              } else {
+                router.replace(`/artist/${user.id}`);
+              }
             } else {
               router.replace('/drops');
             }
