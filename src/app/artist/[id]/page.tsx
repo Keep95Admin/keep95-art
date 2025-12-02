@@ -17,20 +17,21 @@ export default async function ArtistDashboard({ params }: { params: Promise<{ id
     .eq('artist_id', id)
     .order('created_at', { ascending: false });
 
-  const switchMode = async () => {
-    await supabase.from('profiles')
-      .update({ current_mode: 'consumer' })
-      .eq('user_id', user.id);
-    redirect('/drops');
-  };
-
   return (
     <main className="min-h-screen bg-black text-white p-8">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-5xl font-black mb-8">Your Gallery Dashboard</h1>
-        <button onClick={switchMode} className="bg-cyan-500 text-black p-4 rounded-full font-bold hover:bg-cyan-400 mb-8">
-          Switch to Collect Mode
-        </button>
+        <form action={async () => {
+          'use server';
+          await supabase.from('profiles')
+            .update({ current_mode: 'consumer' })
+            .eq('user_id', user.id);
+          redirect('/drops');
+        }}>
+          <button className="bg-cyan-500 text-black p-4 rounded-full font-bold hover:bg-cyan-400 mb-8">
+            Collect
+          </button>
+        </form>
         {drops && drops.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {drops.map((drop) => (
