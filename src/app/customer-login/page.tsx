@@ -1,8 +1,6 @@
-// src/app/customer-login/page.tsx
 'use client'
-
 import { useState } from 'react'
-import { supabase } from '@/utils/supabase/client'
+import { createClient } from '@/utils/supabase/client'
 import Link from 'next/link'
 
 export default function CustomerLogin() {
@@ -12,9 +10,9 @@ export default function CustomerLogin() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    const supabase = createClient();  // Create client here
     setLoading(true)
     setMessage('')
-
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
@@ -22,7 +20,6 @@ export default function CustomerLogin() {
         emailRedirectTo: `${window.location.origin}/auth/complete-signup`,
       },
     })
-
     if (error) {
       setMessage('Error: ' + error.message)
       setLoading(false)
@@ -35,12 +32,10 @@ export default function CustomerLogin() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-black to-gray-900 flex items-center justify-center px-6 py-24">
       <div className="max-w-md w-full text-center space-y-12">
-
         {/* Back link */}
         <Link href="/" className="text-white/70 hover:text-white text-lg underline">
           ← Back to Keep95.art
         </Link>
-
         {/* Header */}
         <div className="space-y-6">
           <h1 className="text-5xl md:text-6xl font-black text-white leading-tight">
@@ -51,7 +46,6 @@ export default function CustomerLogin() {
             We’ll email you a magic link.
           </p>
         </div>
-
         {/* Form */}
         <form onSubmit={handleLogin} className="space-y-8">
           <input
@@ -62,7 +56,6 @@ export default function CustomerLogin() {
             required
             className="w-full px-8 py-6 bg-white/10 border border-white/20 rounded-full text-white placeholder-white/50 text-xl focus:outline-none focus:border-white transition"
           />
-
           <button
             type="submit"
             disabled={loading}
@@ -71,14 +64,12 @@ export default function CustomerLogin() {
             {loading ? 'Sending...' : 'Send Magic Link'}
           </button>
         </form>
-
         {/* Success / error message */}
         {message && (
           <p className={`text-lg font-medium ${message.includes('Check') ? 'text-green-400' : 'text-red-400'}`}>
             {message}
           </p>
         )}
-
         {/* Terms */}
         <p className="text-white/50 text-sm">
           By signing in you agree to our{' '}
