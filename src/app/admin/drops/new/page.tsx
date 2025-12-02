@@ -1,10 +1,11 @@
 'use client';
 
-import { supabase } from '@/utils/supabase/client';
+import { createClient } from '@/utils/supabase/client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function NewDrop() {
+  const supabase = createClient();  // Create client here
   const [policy, setPolicy] = useState<'non_refundable' | '7_day_preview' | 'custom'>('non_refundable');
   const [uploading, setUploading] = useState(false);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
@@ -29,7 +30,7 @@ export default function NewDrop() {
     });
 
     return () => listener?.subscription.unsubscribe();
-  }, [router]);
+  }, [router, supabase]);  // Add supabase to deps if needed
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
