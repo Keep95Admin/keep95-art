@@ -1,7 +1,6 @@
 // src/app/login/page.tsx — WORKS WITH YOUR CURRENT client.ts
 'use client';
-
-import { supabase } from '@/utils/supabase/client';
+import { createClient } from '@/utils/supabase/client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -13,16 +12,15 @@ export default function ArtistLogin() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const supabase = createClient();  // Create client here
     setLoading(true);
     setMessage('');
-
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
-
     if (error) {
       setMessage(`Error: ${error.message}`);
     } else {
@@ -39,7 +37,6 @@ export default function ArtistLogin() {
           <h2 className="text-4xl font-black tracking-tight">Artist Portal</h2>
           <p className="mt-3 text-gray-400">No passwords. Just your email.</p>
         </div>
-
         <form onSubmit={handleSubmit} className="space-y-6">
           <input
             type="email"
@@ -49,7 +46,6 @@ export default function ArtistLogin() {
             placeholder="your@email.com"
             className="w-full px-5 py-4 bg-gray-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/50 transition"
           />
-
           <button
             type="submit"
             disabled={loading}
@@ -58,17 +54,15 @@ export default function ArtistLogin() {
             {loading ? 'Sending...' : 'Send Magic Link'}
           </button>
         </form>
-
         {message && (
           <div className={`p-5 rounded-xl text-center text-lg font-bold ${
-            message.includes('Error') 
-              ? 'bg-red-900/70 text-red-200' 
+            message.includes('Error')
+              ? 'bg-red-900/70 text-red-200'
               : 'bg-green-900/70 text-green-200'
           }`}>
             {message}
           </div>
         )}
-
         <p className="text-center text-gray-500 text-sm">
           Works for login <strong>AND</strong> signup — just use your email.
         </p>
