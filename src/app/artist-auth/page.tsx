@@ -39,14 +39,13 @@ export default function ArtistAuth() {
         return;
       }
       if (data.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert([
-            { id: data.user.id, email, username, role: 'artist', wallet_address: '' }
-          ], { onConflict: 'id' });
-
-        if (profileError) {
-          setError(profileError.message);
+        const response = await fetch('/api/artist-profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: data.user.id, email, username }),
+        });
+        if (!response.ok) {
+          setError('Failed to create artist profile');
           setLoading(false);
           return;
         }
