@@ -1,72 +1,62 @@
-// src/app/login/page.tsx — WORKS WITH YOUR CURRENT client.ts
 'use client';
 import { createClient } from '@/utils/supabase/client';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
-export default function ArtistLogin() {
+export default function AuthPage() {
   const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const router = useRouter();
+  const [password, setPassword] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const supabase = createClient();  // Create client here
-    setLoading(true);
-    setMessage('');
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-    if (error) {
-      setMessage(`Error: ${error.message}`);
+    const supabase = createClient();  // Instantiate client at runtime
+    if (isSignUp) {
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) alert(error.message);
+      else alert('Check your email to confirm!');
     } else {
-      setMessage('Check your email — magic link sent!');
-      setTimeout(() => router.push('/drops'), 3000);
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) alert(error.message);
+      else window.location.href = '/admin/drops/new';
     }
-    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center py-12">
-      <div className="max-w-md w-full space-y-8 p-10 bg-gray-900 rounded-2xl shadow-2xl">
-        <div className="text-center">
-          <h2 className="text-4xl font-black tracking-tight">Artist Portal</h2>
-          <p className="mt-3 text-gray-400">No passwords. Just your email.</p>
-        </div>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="your@email.com"
-            className="w-full px-5 py-4 bg-gray-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/50 transition"
-          />
+    <div className="min-h-screen bg-black text-white flex items-center justify-center p-8">
+      <form onSubmit={handleSubmit} className="bg-white text-black p-10 rounded-2xl shadow-2xl w-full max-w-md">
+        <h1 className="text-4xl font-black text-center mb-8">
+          {isSignUp ? 'Sign Up' : 'Login'}
+        </h1>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full p-3 border-2 rounded mb-4"
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full p-3 border-2 rounded mb-6"
+          required
+        />
+        <button type="submit" className="w-full bg-black text-white py-3 rounded font-bold text-xl cursor-pointer">
+          {isSignUp ? 'Create Account' : 'Sign In'}
+        </button>
+        <p className="text-center mt-6 text-sm">
+          {isSignUp ? 'Have an account?' : "Don't have an account?"}{' '}
           <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-5 bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-2xl font-black rounded-xl transition shadow-lg"
+            type="button"
+            onClick={() => setIsSignUp(!isSignUp)}
+            className="underline font-bold cursor-pointer"
           >
-            {loading ? 'Sending...' : 'Send Magic Link'}
+            {isSignUp ? 'Sign In' : 'Sign Up'}
           </button>
-        </form>
-        {message && (
-          <div className={`p-5 rounded-xl text-center text-lg font-bold ${
-            message.includes('Error')
-              ? 'bg-red-900/70 text-red-200'
-              : 'bg-green-900/70 text-green-200'
-          }`}>
-            {message}
-          </div>
-        )}
-        <p className="text-center text-gray-500 text-sm">
-          Works for login <strong>AND</strong> signup — just use your email.
         </p>
-      </div>
+      </form>
     </div>
   );
 }
