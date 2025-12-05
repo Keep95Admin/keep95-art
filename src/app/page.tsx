@@ -17,12 +17,12 @@ export default async function Home() {
       .single();
 
     if (profile?.role === 'artist') {
-      if (profile.current_mode === 'consumer') {
+      if (profile.current_mode === 'collector') {
         redirect('/drops');
       } else {
         redirect(`/artist/${user.id}`);
       }
-    } else if (profile?.role === 'consumer') {
+    } else if (profile?.role === 'collector') {
       redirect('/drops');
     }
   }
