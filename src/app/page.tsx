@@ -61,7 +61,7 @@ export default async function Home() {
               Artist Login / Signup
             </button>
           </Link>
-          <Link href="/customer-auth" className="block">
+          <Link href="/collector-auth" className="block">
             <button className="bg-black text-white border-4 border-white px-12 py-4 rounded-full text-2xl font-black tracking-tighter hover:bg-white hover:text-black transition w-full max-w-md">
               Collector Login / Signup
             </button>
